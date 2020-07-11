@@ -15,7 +15,7 @@ def get_industrys(level='L1'):
     return industrys
 
 
-def get_daily_data(industry:str, fields:list, adj=True):
+def get_daily_data(industry='all', fields=['open', 'high', 'low', 'close'], adj=True):
     industrys = get_industrys(level='L1')
     
     if adj:
@@ -25,16 +25,22 @@ def get_daily_data(industry:str, fields:list, adj=True):
     
     data = {}
     
+    if industry == 'all':
+        industry = list(industrys.keys())
+
     for field in fields:
-        if field in adj_fields:
-            data[field] = DataFrame({stock: pd.read_csv('../DataBase/StockDailyData/%s/%s.csv'%(industry, stock), index_col=[0], parse_dates=[0]).loc[:, field] * pd.read_csv('../DataBase/StockDailyData/%s/%s.csv'%(industry, stock), index_col=[0], parse_dates=[0]).loc[:, 'adj_factor'] for stock in industrys[industry]})
-        else:
-            data[field] = DataFrame({stock: pd.read_csv('../DataBase/StockDailyData/%s/%s.csv'%(industry, stock), index_col=[0], parse_dates=[0]).loc[:, field] for stock in industrys[industry]})
+        data[field] = DataFrame()
     
+    for i in industry:
+        for field in fields:
+            if field in adj_fields:
+                data[field] = pd.concat([data[field], DataFrame({stock: pd.read_csv('../DataBase/StockDailyData/%s/%s.csv'%(i, stock), index_col=[0], parse_dates=[0]).loc[:, field] * pd.read_csv('../DataBase/StockDailyData/%s/%s.csv'%(i, stock), index_col=[0], parse_dates=[0]).loc[:, 'adj_factor'] for stock in industrys[i]})], 1)
+            else:
+                data[field] = pd.concat([data[field], DataFrame({stock: pd.read_csv('../DataBase/StockDailyData/%s/%s.csv'%(i, stock), index_col=[0], parse_dates=[0]).loc[:, field] for stock in industrys[i]})], 1)
+
     return data
 
 
 def centralize(data):
     return data.subtract(data.mean(1), 0)
-
 
