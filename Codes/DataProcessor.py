@@ -15,32 +15,31 @@ def get_industrys(level='L1'):
     return industrys
 
 
-def get_daily_data(industry='all', fields=['open', 'high', 'low', 'close'], adj=True):
+def get_daily_data(industry='all', fields=['open', 'high', 'low', 'close']):
     industrys = get_industrys(level='L1')
-    
-    if adj:
-        adj_fields = ['open', 'high', 'low', 'close']
-    else:
-        adj_fields = []
     
     data = {}
     
     if industry == 'all':
-        industry = list(industrys.keys())
-
-    for field in fields:
-        data[field] = DataFrame()
+        stocks = [j for i in industrys.values() for j in i]
+    else:
+        stocks = [j for i in industry for j in industrys[i]]
     
-    for i in industry:
-        for field in fields:
-            if field in adj_fields:
-                data[field] = pd.concat([data[field], DataFrame({stock: pd.read_csv('../DataBase/StockDailyData/%s/%s.csv'%(i, stock), index_col=[0], parse_dates=[0]).loc[:, field] * pd.read_csv('../DataBase/StockDailyData/%s/%s.csv'%(i, stock), index_col=[0], parse_dates=[0]).loc[:, 'adj_factor'] for stock in industrys[i]})], 1)
-            else:
-                data[field] = pd.concat([data[field], DataFrame({stock: pd.read_csv('../DataBase/StockDailyData/%s/%s.csv'%(i, stock), index_col=[0], parse_dates=[0]).loc[:, field] for stock in industrys[i]})], 1)
-
+    for field in fields:
+        data[field] = DataFrame({stock: pd.read_csv('../DataBase/StockDailyData/Stock/%s.csv'%stock, index_col=[0], parse_dates=[0]).loc[:, field] for stock in stocks})
+        
     return data
 
 
 def centralize(data):
     return data.subtract(data.mean(1), 0)
 
+def standardize(data):
+    return data.subtract(data.mean(1), 0).divide(data.std(1), 0)
+
+def ma_ratio(data, ma_short, ma_long):
+    return data.rolling(ma_short).mean() / data.rolling(ma_long).mean()
+
+def standardize_industry(data):
+    industrys = get_industrys(level='L1')
+    
