@@ -22,9 +22,9 @@ stocks = pro.stock_basic(fields='ts_code').ts_code
 df_daily = DataFrame()
 for stock in stocks:
     df = pd.concat([
-        pro.daily(ts_code=stock, start_date=start, end_date=end, fields='ts_code, trade_date, open, high, low, close, vol').set_index('trade_date'),
+        pro.daily(ts_code=stock, start_date=start, end_date=end, fields='ts_code, trade_date, open, high, low, close').set_index('trade_date'),
         pro.adj_factor(ts_code=stock, start_date=start, end_date=end, fields='trade_date, adj_factor').set_index('trade_date'),
-        pro.daily_basic(ts_code=stock, start_date=start, end_date=end, fields='trade_date, turnover_rate_f, volume_ratio, pe_ttm, pb, ps_ttm, total_mv, circ_mv').set_index('trade_date'),
+        pro.daily_basic(ts_code=stock, start_date=start, end_date=end, fields='trade_date, turnover_rate_f, pe_ttm, pb, ps_ttm, total_mv, circ_mv').set_index('trade_date'),
         pro.moneyflow(ts_code=stock, start_date=start, end_date=end, fields='trade_date, buy_sm_vol, sell_sm_vol, buy_md_vol, sell_md_vol, buy_lg_vol, sell_lg_vol, buy_elg_vol, sell_elg_vol, net_mf_vol').set_index('trade_date'),
     ], axis=1, sort=False)
     df = df.sort_index()
