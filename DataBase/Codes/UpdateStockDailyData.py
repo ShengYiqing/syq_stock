@@ -9,10 +9,7 @@ from pandas import Series, DataFrame
 
 today = datetime.datetime.today().strftime('%Y%m%d')
 
-if len(sys.argv) > 1:
-    start = sys.argv[1]
-else:
-    start = '20050101'
+start = today
 end = today
 
 pro = ts.pro_api()
@@ -34,7 +31,7 @@ for stock in stocks:
     df = pd.concat([df, pro.moneyflow(ts_code=stock, start_date=start, end_date=end, fields='trade_date, buy_sm_vol, sell_sm_vol, buy_md_vol, sell_md_vol, buy_lg_vol, sell_lg_vol, buy_elg_vol, sell_elg_vol, net_mf_vol').set_index('trade_date')], axis=1, sort=False)
     df = df.sort_index()
     '''
-    df.to_csv('../StockDailyData/Stock/%s.csv'%stock)
+    df.to_csv('../StockDailyData/Stock/%s.csv'%stock, mode='a', header=False)
     if len(df) > 0:
         if df.notna().iloc[-1, :].any():
             df_daily = pd.concat([df_daily, df.iloc[-1:, :]], axis=0, sort=False)
