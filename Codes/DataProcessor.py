@@ -47,45 +47,6 @@ def get_stock_daily_data(industrys, industry='all', fields=['open',
         
     return data
 
-def get_index_daily_data(industrys, industry='all', fields=['open',
-                                 'high',
-                                 'low',
-                                 'close',
-                                 'adj_factor',
-                                 'turnover_rate_f',
-                                 'pe_ttm',
-                                 'pb',
-                                 'ps_ttm',
-                                 'total_mv']):
-    
-    if industry == 'all':
-        industry = industrys.keys()
-        
-    data = get_stock_daily_data(industrys, industry, fields)
-    
-    OPEN = data['open'] * data['adj_factor']
-    HIGH = data['high'] * data['adj_factor']
-    LOW = data['low'] * data['adj_factor']
-    CLOSE = data['close'] * data['adj_factor']
-    OPEN.fillna(method='ffill', inplace=True)
-    HIGH.fillna(method='ffill', inplace=True)
-    LOW.fillna(method='ffill', inplace=True)
-    CLOSE.fillna(method='ffill', inplace=True)
-    trf = data['turnover_rate_f']
-
-    mv = data['total_mv']
-
-    
-    data_industry = {}
-    data_industry['open'] = DataFrame({i:OPEN.loc[:, industrys[i]].mean(1) for i in industry})
-    data_industry['high'] = DataFrame({i:HIGH.loc[:, industrys[i]].mean(1) for i in industry})
-    data_industry['low'] = DataFrame({i:LOW.loc[:, industrys[i]].mean(1) for i in industry})
-    data_industry['close'] = DataFrame({i:CLOSE.loc[:, industrys[i]].mean(1) for i in industry})
-    
-    data_industry['turnover_rate_f'] = DataFrame({i:trf.loc[:, industrys[i]].median(1) for i in industry})
-    data_industry['total_mv'] = DataFrame({i:mv.loc[:, industrys[i]].sum(1) for i in industry})
-    
-    return data_industry
 
 def get_stock_money_data(industrys, industry='all', fields=['gt_vol', 'rzye', 'rqye']):
     
@@ -99,10 +60,25 @@ def get_stock_money_data(industrys, industry='all', fields=['gt_vol', 'rzye', 'r
     for stock in stocks:
         if os.path.exists('../DataBase/StockMoneyData/Stock/%s.csv'%stock):
             df = pd.read_csv('../DataBase/StockMoneyData/Stock/%s.csv'%stock, index_col=[0], parse_dates=[0])
-            for field in df.columns:
+            for field in fields:
                 data[field].loc[:, stock] = df.loc[:, field]
     
     return data
+
+
+def get_index_data(industrys, industry='all', fields=['open', 'high', 'low', 'close', 'trf', 'gt_amount', 'rzye', 'rqye', 'buy_sm_amount', 'sell_sm_amount', 'buy_md_amount', 'sell_md_amount', 'buy_lg_amount', 'sell_lg_amount', 'buy_elg_amount', 'sell_elg_amount', 'net_mf_amount',]):
+    
+    data = {field:DataFrame() for field in fields}
+    
+    if industry == 'all':
+        industry = industrys.keys()
+    
+    for i in industry:
+        df = pd.read_csv('../DataBase/IndexData/Index/%s.csv'%i, index_col=[0], parse_dates=[0])
+        for field in fields:
+            data[field].loc[:, i] = df.loc[:, field]
+    return data
+
 
 def centralize(data):
     return data.subtract(data.mean(1), 0)
