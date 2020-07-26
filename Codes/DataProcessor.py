@@ -94,3 +94,18 @@ def standardize_industry(data, industrys, industry):
     ret = pd.concat([df for df in data_dic.values()], axis=1)
     
     return ret
+
+def get_st_data(industrys, industry, df):
+    pro=ts.pro_api()
+    st = DataFrame(False, index=df.index, columns=df.columns)
+    for stock in st.columns:
+        nc = pro.namechange(ts_code=stock)
+        time.sleep(0.3)
+        for i in nc.index:
+            if 'ST' in nc.loc[i, 'name']:
+                if nc.loc[i, 'end_date'] == None:
+                    st.loc[(datetime.datetime.strptime(nc.loc[i, 'start_date'], '%Y%m%d') <= st.index), stock] = True
+                else:
+                    st.loc[(datetime.datetime.strptime(nc.loc[i, 'start_date'], '%Y%m%d') <= st.index) & (st.index <= (datetime.datetime.strptime(nc.loc[i, 'end_date'], '%Y%m%d'))), stock] = True
+    
+    return st
