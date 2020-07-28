@@ -22,8 +22,8 @@ stocks = pro.stock_basic(fields='ts_code').ts_code
 df_daily = DataFrame()
 for stock in stocks:
     df = pd.concat([
-        pro.hk_hold(ts_code=stock).set_index('trade_date').sort_index().vol.rename('gt_vol'),
-        pro.margin_detail(ts_code=stock).set_index('trade_date').loc[:, ['rzye', 'rqye']],
+        pro.hk_hold(ts_code=stock, start_date=start, end_date=end).set_index('trade_date').sort_index().vol.rename('gt_vol'),
+        pro.margin_detail(ts_code=stock, start_date=start, end_date=end).set_index('trade_date').loc[:, ['rzye', 'rqye']],
         pro.moneyflow(ts_code=stock, start_date=start, end_date=end, fields='trade_date, ts_code, buy_sm_amount, sell_sm_amount, buy_md_amount, sell_md_amount, buy_lg_amount, sell_lg_amount, buy_elg_amount, sell_elg_amount, net_mf_amount').set_index('trade_date'),
     
     ], axis=1, sort=False)

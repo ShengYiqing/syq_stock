@@ -31,10 +31,10 @@ for industry in industrys.keys():
     stocks = industrys[industry]
     stocks_daily_data = {stock:pd.read_csv('../StockDailyData/Stock/%s.csv'%stock, index_col=[0], parse_dates=[0]) for stock in stocks}
     ADJ_FACTOR = DataFrame({stock:stocks_daily_data[stock].adj_factor for stock in stocks})
-    OPEN = DataFrame({stock:stocks_daily_data[stock].open for stock in stocks}) * ADJ_FACTOR
-    HIGH = DataFrame({stock:stocks_daily_data[stock].high for stock in stocks}) * ADJ_FACTOR
-    LOW = DataFrame({stock:stocks_daily_data[stock].low for stock in stocks}) * ADJ_FACTOR
-    CLOSE = DataFrame({stock:stocks_daily_data[stock].close for stock in stocks}) * ADJ_FACTOR
+    OPEN = DataFrame({stock:stocks_daily_data[stock].open for stock in stocks}).fillna(method='ffill') * ADJ_FACTOR
+    HIGH = DataFrame({stock:stocks_daily_data[stock].high for stock in stocks}).fillna(method='ffill') * ADJ_FACTOR
+    LOW = DataFrame({stock:stocks_daily_data[stock].low for stock in stocks}).fillna(method='ffill') * ADJ_FACTOR
+    CLOSE = DataFrame({stock:stocks_daily_data[stock].close for stock in stocks}).fillna(method='ffill') * ADJ_FACTOR
     
     TRF = DataFrame({stock:stocks_daily_data[stock].turnover_rate_f for stock in stocks})
     

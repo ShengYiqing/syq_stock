@@ -19,9 +19,9 @@ stocks = pro.stock_basic(fields='ts_code').ts_code
 df_daily = DataFrame()
 for stock in stocks:
     df = pd.concat([
-        pro.daily(ts_code=stock, start_date=start, end_date=end, fields='ts_code, trade_date, open, high, low, close').set_index('trade_date'),
+        pro.daily(ts_code=stock, start_date=start, end_date=end, fields='ts_code, trade_date, open, high, low, close, vol, amount').set_index('trade_date'),
         pro.adj_factor(ts_code=stock, start_date=start, end_date=end, fields='trade_date, adj_factor').set_index('trade_date'),
-        pro.daily_basic(ts_code=stock, start_date=start, end_date=end, fields='trade_date, turnover_rate_f, pe_ttm, pb, ps_ttm, total_mv, circ_mv').set_index('trade_date'),
+        pro.daily_basic(ts_code=stock, start_date=start, end_date=end, fields='trade_date, turnover_rate_f, pe_ttm, pb, ps_ttm, dv_ttm, total_mv, circ_mv').set_index('trade_date'),
     ], axis=1, sort=False)
     df = df.sort_index()
     '''
@@ -35,4 +35,4 @@ for stock in stocks:
     if len(df) > 0:
         if df.notna().iloc[-1, :].any():
             df_daily = pd.concat([df_daily, df.iloc[-1:, :]], axis=0, sort=False)
-df_daily.set_index('ts_code').to_csv('../StockDailyData/Daily/%s.csv'%today)
+df_daily.set_index('ts_code').to_csv('../StockDailyData/Daily/%s.csv'%df.index[-1])
