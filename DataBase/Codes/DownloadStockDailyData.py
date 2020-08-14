@@ -26,6 +26,16 @@ for stock in stocks:
         pro.adj_factor(ts_code=stock, start_date=start, end_date=end, fields='trade_date, adj_factor').set_index('trade_date'),
         pro.daily_basic(ts_code=stock, start_date=start, end_date=end, fields='trade_date, turnover_rate_f, pe_ttm, pb, ps_ttm, dv_ttm, total_mv, circ_mv').set_index('trade_date'),
     ], axis=1, sort=False)
+    st = DataFrame(False, index=df.index, columns=[stock])
+    nc = pro.namechange(ts_code=stock)
+    for i in nc.index:
+        if 'ST' in nc.loc[i, 'name']:
+            if nc.loc[i, 'end_date'] == None:
+                st.loc[nc.loc[i, 'start_date'] <= st.index, stock] = True
+            else:
+                st.loc[(nc.loc[i, 'start_date'] <= st.index) & (st.index <= nc.loc[i, 'end_date']), stock] = True
+    st.columns = ['st']
+    df = pd.concat([df, st], axis=1, sort=False)
     df = df.sort_index()
     '''
     df = pro.daily(ts_code=stock, start_date=start, end_date=end).set_index('trade_date')

@@ -35,7 +35,9 @@ for industry in industrys.keys():
     HIGH = DataFrame({stock:stocks_daily_data[stock].high for stock in stocks}).fillna(method='ffill') * ADJ_FACTOR
     LOW = DataFrame({stock:stocks_daily_data[stock].low for stock in stocks}).fillna(method='ffill') * ADJ_FACTOR
     CLOSE = DataFrame({stock:stocks_daily_data[stock].close for stock in stocks}).fillna(method='ffill') * ADJ_FACTOR
-    
+    AMOUNT = DataFrame({stock:stocks_daily_data[stock].amount for stock in stocks}).fillna(method='ffill') * ADJ_FACTOR * 1000
+    VOL = DataFrame({stock:stocks_daily_data[stock].vol for stock in stocks}).fillna(method='ffill') * 100
+    VWAP_S = AMOUNT / VOL
     TRF = DataFrame({stock:stocks_daily_data[stock].turnover_rate_f for stock in stocks})
     
     stocks_money_data = {stock:pd.read_csv('../StockMoneyData/Stock/%s.csv'%stock, index_col=[0], parse_dates=[0]) for stock in stocks}
@@ -58,6 +60,7 @@ for industry in industrys.keys():
                        'high':HIGH.mean(1),
                        'low':LOW.mean(1),
                        'close':CLOSE.mean(1),
+                       'vwap':VWAP_S.mean(1),
                        'trf':TRF.median(1),
                        'gt_amount':GT_AMOUNT.sum(1),
                        'rzye':RZYE.sum(1),
