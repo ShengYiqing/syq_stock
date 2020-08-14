@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 from pandas import Series, DataFrame
 import tushare as ts
+from scipy.stats import rankdata
 
 def get_industrys(level='L2'):
     #获取行业分类
@@ -29,11 +30,14 @@ def get_stock_daily_data(industrys, industry='all', fields=['open',
                                  'high',
                                  'low',
                                  'close',
+                                 'vol',
+                                 'amount',
                                  'adj_factor',
                                  'turnover_rate_f',
                                  'pe_ttm',
                                  'pb',
                                  'ps_ttm',
+                                 'dv_ttm',
                                  'total_mv']):
     data = {}
     
@@ -66,7 +70,7 @@ def get_stock_money_data(industrys, industry='all', fields=['gt_vol', 'rzye', 'r
     return data
 
 
-def get_index_data(industrys, industry='all', fields=['open', 'high', 'low', 'close', 'trf', 'gt_amount', 'rzye', 'rqye', 'buy_sm_amount', 'sell_sm_amount', 'buy_md_amount', 'sell_md_amount', 'buy_lg_amount', 'sell_lg_amount', 'buy_elg_amount', 'sell_elg_amount', 'net_mf_amount',]):
+def get_index_data(industrys, industry='all', fields=['open', 'high', 'low', 'close', 'vwap', 'trf', 'gt_amount', 'rzye', 'rqye', 'buy_sm_amount', 'sell_sm_amount', 'buy_md_amount', 'sell_md_amount', 'buy_lg_amount', 'sell_lg_amount', 'buy_elg_amount', 'sell_elg_amount', 'net_mf_amount',]):
     
     data = {field:DataFrame() for field in fields}
     
